@@ -1,0 +1,268 @@
+<!-- save as hud-overlay.html and open, or copy the <style> + <div class="hud"> into your page -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Scan HUD Overlay</title>
+<style>
+  :root{
+    --hud-cyan: rgba(6,230,200,0.92);
+    --hud-teal: rgba(2,110,102,0.12);
+    --glow: 0 0 18px rgba(6,230,200,0.08);
+    --scan-speed: 3.6s;        /* speed of vertical scan bar */
+    --glitch-speed: 2.2s;      /* speed of glitch slices */
+    --sweep-speed: 4s;         /* radial sweep */
+    --scanline-opacity: 0.06;  /* strength of subtle scanlines */
+  }
+
+  /* container to show how to overlay. Replace the <img> src. */
+  .scene {
+    width: 480px;              /* change to match your portrait */
+    height: 720px;             /* portrait aspect ratio 2:3 — change if needed */
+    margin: 24px auto;
+    position: relative;
+    background: #041a19;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.5) inset;
+    overflow: hidden;
+  }
+
+  /* the face image (the user will supply) */
+  .scene img.face {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(1) contrast(.95) brightness(.92);
+    /* subtle teal tint so it matches the system style */
+    mix-blend-mode: multiply;
+  }
+
+  /* hud overlay sits above the image */
+  .hud {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: block;
+  }
+
+  /* faint vignette + noise */
+  .hud .vignette {
+    position:absolute; inset:0;
+    background:
+      radial-gradient(60% 60% at 50% 40%, rgba(0,40,36,0) 0%, rgba(0,40,36,0.08) 60%, rgba(0,0,0,0.38) 100%);
+    mix-blend-mode: multiply;
+    opacity: .9;
+    z-index: 2;
+  }
+
+  /* subtle repeating horizontal scanlines */
+  .hud .scanlines {
+    position:absolute; inset:0;
+    background-image: linear-gradient(to bottom, rgba(255,255,255,var(--scanline-opacity)) 0 1px, transparent 1px);
+    background-size: 100% 6px;
+    mix-blend-mode: overlay;
+    z-index: 5;
+    opacity: 0.9;
+  }
+
+  /* vertical sweeping scan bar */
+  .hud .vertical-scan {
+    position:absolute;
+    left: -30%;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,0) 0%,
+                         rgba(6,230,200,0.03) 35%,
+                         rgba(6,230,200,0.12) 48%,
+                         rgba(6,230,200,0.03) 62%,
+                         rgba(0,0,0,0) 100%);
+    mix-blend-mode: screen;
+    filter: blur(8px);
+    animation: sweep var(--scan-speed) linear infinite;
+    z-index: 8;
+    opacity: .95;
+    box-shadow: var(--glow);
+  }
+
+  @keyframes sweep {
+    0%   { transform: translateX(-120%); }
+    50%  { transform: translateX(120%); }
+    100% { transform: translateX(360%); }
+  }
+
+  /* radial conic sweep that can be timed to the transition */
+  .hud .radial-sweep {
+    position:absolute; left:50%; top:40%;
+    width:140%; height:140%;
+    transform:translate(-50%,-40%) rotate(-25deg);
+    background: conic-gradient(from 0deg, rgba(6,230,200,0.06) 0deg, rgba(6,230,200,0.15) 20deg, rgba(6,230,200,0.02) 40deg, transparent 60deg);
+    mix-blend-mode: screen;
+    opacity: 0.7;
+    filter: blur(12px);
+    animation: spin var(--sweep-speed) linear infinite;
+    z-index: 6;
+    pointer-events: none;
+  }
+  @keyframes spin { to { transform: translate(-50%,-40%) rotate(335deg); } }
+
+  /* faint hexagonal grid (SVG is used but we style container here) */
+  .hud .hex-grid { z-index: 3; opacity: .08; }
+
+  /* HUD outline/frame + faint UI marks */
+  .hud .frame {
+    position:absolute; inset:16px;
+    border: 2px solid rgba(6,230,200,0.15);
+    box-shadow: 0 0 24px rgba(6,230,200,0.02) inset;
+    z-index: 12;
+    pointer-events: none;
+  }
+
+  /* UID/label placeholders (you can toggle) */
+  .hud .label {
+    position:absolute;
+    left: 22px;
+    top: 18px;
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: .08em;
+    color: rgba(230,60,110,0.95); /* magenta UID accent */
+    z-index: 14;
+    text-transform: uppercase;
+    mix-blend-mode: screen;
+  }
+
+  /* glitch slice effect - static slices shifted and animated to jitter */
+  .hud .glitch-slice {
+    position:absolute;
+    inset:0;
+    z-index: 16;
+    mix-blend-mode: screen;
+    pointer-events: none;
+  }
+  .glitch-slice .slice {
+    position:absolute;
+    left:0; right:0;
+    height:10%;
+    background: linear-gradient(90deg, rgba(6,230,200,0.03), rgba(6,230,200,0.08));
+    transform: translateX(0);
+    animation: glitch-move var(--glitch-speed) linear infinite;
+    opacity: .75;
+    filter: blur(.6px);
+  }
+  .glitch-slice .slice:nth-child(1){ top:16%; animation-delay: 0s; opacity:.6; }
+  .glitch-slice .slice:nth-child(2){ top:36%; animation-delay: -.28s; opacity:.45; height:6%;}
+  .glitch-slice .slice:nth-child(3){ top:58%; animation-delay: -.6s; opacity:.55; height:8%;}
+  @keyframes glitch-move {
+    0% { transform: translateX(0) skewX(0deg); opacity:.4; }
+    10%{ transform: translateX(-6px) skewX(-1.4deg); opacity:.8; }
+    30%{ transform: translateX(10px) skewX(1deg); opacity:.35; }
+    60%{ transform: translateX(-2px) skewX(-0.5deg); opacity:.7; }
+    100%{ transform: translateX(0) skewX(0deg); opacity:.5; }
+  }
+
+  /* small, subtle crosshair and measurement marks */
+  .hud .crosshair {
+    position:absolute;
+    left:50%; top:46%;
+    transform:translate(-50%,-50%);
+    width:120px; height:120px;
+    z-index: 15;
+    opacity:.9;
+    mix-blend-mode: screen;
+    pointer-events:none;
+  }
+
+  /* subtle color grading tint layer */
+  .hud .tint {
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(2,80,74,0.06), rgba(0,0,0,0.12));
+    mix-blend-mode: multiply;
+    z-index: 4;
+  }
+
+  /* helper: hide elements for a cleaner mode */
+  .hud.clean .glitch-slice,
+  .hud.clean .label,
+  .hud.clean .hex-grid { display:none; }
+
+  /* small responsive note */
+  @media (max-width:520px){
+    .scene { width: 92vw; height: calc(92vw * 1.5); }
+  }
+</style>
+</head>
+<body>
+
+<!-- scene demo: replace img src with your portrait and copy hud into your app for overlay -->
+<div class="scene">
+  <!-- user-supplied face - replace this with your actual portrait img file -->
+  <img class="face" src="portrait-placeholder.jpg" alt="portrait">
+
+  <!-- the HUD overlay -->
+  <div class="hud" aria-hidden="true">
+    <div class="vignette"></div>
+    <div class="scanlines"></div>
+
+    <!-- vertical moving scan -->
+    <div class="vertical-scan" style="animation-duration: var(--scan-speed);"></div>
+
+    <!-- radial sweep that slowly rotates -->
+    <div class="radial-sweep"></div>
+
+    <!-- faint hex grid draws as SVG so it scales cleanly -->
+    <svg class="hex-grid" viewBox="0 0 480 720" preserveAspectRatio="none"
+         style="position:absolute; inset:0; width:100%; height:100%;">
+      <defs>
+        <pattern id="hex" width="24" height="20" patternUnits="userSpaceOnUse">
+          <path d="M12 0 L24 6 L24 14 L12 20 L0 14 L0 6 Z" fill="none" stroke="rgba(6,230,200,0.18)" stroke-width="0.6"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hex)" opacity="0.08"/>
+      <!-- small faint measurement ticks -->
+      <g stroke="rgba(6,230,200,0.12)" stroke-width="1" opacity="0.8">
+        <line x1="24" y1="40" x2="70" y2="40"/>
+        <line x1="24" y1="60" x2="70" y2="60"/>
+        <line x1="24" y1="80" x2="70" y2="80"/>
+      </g>
+    </svg>
+
+    <!-- frame -->
+    <div class="frame"></div>
+
+    <!-- UID label (toggle or replace content) -->
+    <div class="label">UID: 00-6A-2F-90</div>
+
+    <!-- glitch slices -->
+    <div class="glitch-slice">
+      <div class="slice"></div>
+      <div class="slice"></div>
+      <div class="slice"></div>
+    </div>
+
+    <!-- crosshair -->
+    <svg class="crosshair" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="46" fill="none" stroke="var(--hud-cyan)" stroke-width="0.9" opacity=".9"/>
+      <line x1="60" y1="14" x2="60" y2="28" stroke="var(--hud-cyan)" stroke-width="0.9" />
+      <line x1="60" y1="92" x2="60" y2="106" stroke="var(--hud-cyan)" stroke-width="0.9" />
+      <line x1="14" y1="60" x2="28" y2="60" stroke="var(--hud-cyan)" stroke-width="0.9" />
+      <line x1="92" y1="60" x2="106" y2="60" stroke="var(--hud-cyan)" stroke-width="0.9" />
+    </svg>
+
+    <div class="tint"></div>
+  </div>
+</div>
+
+<!-- Short usage notes:
+   - To overlay on top of your portrait: copy the .hud element (inner HTML) and place it as a positioned child covering the image.
+   - Make the .scene size match your portrait. Remove the demo <img> and use your own.
+   - To export as a standalone transparent PNG overlay (static), render the HUD in a browser sized exactly to the portrait and capture/screenshot with transparency tools, or adapt the SVG pieces into a single SVG file with transparent background.
+   - To make the overlay stronger/weaker: tweak CSS vars at top (--scanline-opacity, --scan-speed, --glitch-speed).
+   - To turn off noisy elements for a cleaner look: add class "clean" to .hud (example: <div class="hud clean">).
+-->
+
+</body>
+</html>

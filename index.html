@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT NIGHTFALL - ACCESS TERMINAL</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="connect-screen" class="screen active">
+        <div class="connect-container">
+            <div class="connect-header">
+                <div class="classification">TOP SECRET</div>
+                <h1>PROJECT NIGHTFALL</h1>
+                <div class="access-warning">AUTHORIZED PERSONNEL ONLY</div>
+            </div>
+            
+            <div class="connect-content">
+                <div class="connect-status">
+                    <div class="status-text">SECURE CONNECTION REQUIRED</div>
+                    <div class="status-description">Click CONNECT to establish encrypted link</div>
+                </div>
+                
+                <button id="connect-btn" class="connect-button">
+                    <span class="connect-text">CONNECT</span>
+                    <div class="connect-indicator"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-screen" class="screen">
+        <div class="login-container">
+            <div class="header">
+                <div class="classification">TOP SECRET</div>
+                <h1>PROJECT NIGHTFALL</h1>
+                <div class="access-warning">AUTHORIZED PERSONNEL ONLY</div>
+            </div>
+            
+            <div class="login-form">
+                <div class="input-group">
+                    <label>USERNAME:</label>
+                    <input type="text" id="username" readonly>
+                    <div class="cursor" id="username-cursor">_</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>PASSWORD:</label>
+                    <input type="password" id="password" readonly>
+                    <div class="cursor" id="password-cursor">_</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="authenticating-popup" class="popup">
+        <div class="popup-content">
+            AUTHENTICATING...
+        </div>
+    </div>
+
+    <div id="access-denied-popup" class="popup">
+        <div class="popup-content error">
+            ACCESS DENIED
+        </div>
+    </div>
+
+    <div id="terminal-window" class="terminal">
+        <div class="terminal-header">
+            <span>TERMINAL</span>
+        </div>
+        <div class="terminal-content">
+            <div id="terminal-output"></div>
+            <div class="terminal-line">
+                <span class="prompt">root@nightfall:~$ </span>
+                <span id="terminal-input"></span>
+                <span class="cursor">_</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="access-granted-popup" class="popup">
+        <div class="popup-content success">
+            ACCESS GRANTED
+        </div>
+    </div>
+
+    <div id="insufficient-privileges-popup" class="popup">
+        <div class="popup-content error">
+            <div>ACCESS DENIED</div>
+            <div style="font-size: 14px; margin-top: 10px;">INSUFFICIENT PRIVILEGES</div>
+            <div style="font-size: 12px; margin-top: 5px;">CLEARANCE LEVEL: OMEGA REQUIRED</div>
+        </div>
+    </div>
+
+    <div id="omega-access-granted-popup" class="popup">
+        <div class="popup-content success">
+            <div>ACCESS GRANTED</div>
+            <div style="font-size: 14px; margin-top: 10px;">OMEGA CLEARANCE OBTAINED</div>
+        </div>
+    </div>
+
+    <div id="intelligence-interface" class="screen">
+        <div class="intel-header">
+            <div class="intel-title">PROJECT NIGHTFALL - INTELLIGENCE ANALYSIS SYSTEM</div>
+            <div class="intel-status">
+                <span>OPERATION: MIDNIGHT</span>
+                <span>STATUS: ACTIVE</span>
+                <span>CLEARANCE: OMEGA</span>
+            </div>
+        </div>
+        
+        <div class="intel-content">
+            <div class="intel-panel command-panel">
+                <div class="panel-header">INTELLIGENCE COMMAND SYSTEM</div>
+                <div class="command-interface-content">
+                    <div class="command-output" id="command-output">
+                        <div class="status-line">
+                            <span class="status-label">STATUS:</span>
+                            <span class="status-text">System ready. Begin typing to execute intelligence operations...</span>
+                        </div>
+                    </div>
+                    <div class="command-input-line">
+                        <span class="input-label">COMMAND: </span>
+                        <span class="command-input" id="command-input"></span>
+                        <span class="cursor">_</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="intel-panel facial-panel">
+                <div class="panel-header">FACIAL RECOGNITION</div>
+                <div class="facial-display" id="facial-display">
+                    <img id="face-image-1" src="" alt="Face" style="display: none;">
+                    <img id="face-image-2" src="" alt="Face" style="display: none;">
+                    <div class="hud-overlay" id="hud-overlay" style="display: none;">
+                        <!-- HUD effects will be added here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="intel-panel globe-panel">
+                <div class="panel-header">GLOBAL TRACKING</div>
+                <div class="globe-display" id="globe-display">
+                    <img id="globe-image" src="images/globe.png" alt="Globe">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="encrypted-file-window" class="file-window">
+        <div class="file-header">
+            <span>OPERATION_MIDNIGHT.dat - [ENCRYPTED]</span>
+            <button class="close-btn" onclick="document.getElementById('encrypted-file-window').classList.remove('show')">×</button>
+        </div>
+        <div class="file-content">
+            <div class="hex-display" id="hex-data"></div>
+        </div>
+        <div class="file-footer">
+            <button class="decrypt-btn" id="decrypt-btn">DECRYPT FILE</button>
+        </div>
+    </div>
+
+    <div id="decryption-key-popup" class="popup">
+        <div class="popup-content">
+            <div style="margin-bottom: 15px;">DECRYPTION KEY REQUIRED</div>
+            <input type="password" id="decryption-key-input" placeholder="Enter decryption key..." style="width: 300px;">
+        </div>
+    </div>
+
+    <div id="decryption-failed-popup" class="popup">
+        <div class="popup-content error">
+            <div>DECRYPTION FAILED</div>
+            <div style="font-size: 14px; margin-top: 10px;">INVALID DECRYPTION KEY</div>
+        </div>
+    </div>
+
+    <div id="facial-scan-popup" class="popup">
+        <div class="popup-content">
+            <div id="scan-status-text">SCANNING FACES...</div>
+        </div>
+    </div>
+
+    <div id="locating-popup" class="popup">
+        <div class="popup-content">
+            <div id="locating-status-text">LOCATING...</div>
+        </div>
+    </div>
+
+    <div id="cctv-window" class="cctv-window">
+        <div class="cctv-header">
+            <span>CCTV-CAM-03 - NEXUS FACILITY</span>
+            <button class="close-btn" onclick="document.getElementById('cctv-window').classList.remove('show')">×</button>
+        </div>
+        <div class="cctv-content">
+            <img id="cctv-image" src="images/cctv.png" alt="CCTV Feed">
+            <div class="cctv-overlay">
+                <div class="cctv-timestamp" id="cctv-timestamp">2024-10-13 23:47:32</div>
+                <div class="cctv-info">
+                    <div class="cctv-camera-id">CAM-03</div>
+                    <div class="cctv-status">⏸ PAUSED</div>
+                </div>
+                <div class="cctv-scanlines"></div>
+                <div class="cctv-crosshair"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="satellite-window" class="satellite-window">
+        <div class="satellite-header">
+            <span>SATCOM UPLINK - ASTRA-2G ORBITAL</span>
+            <button class="close-btn" onclick="document.getElementById('satellite-window').classList.remove('show')">×</button>
+        </div>
+        <div class="satellite-content">
+            <div class="satellite-display">
+                <div class="satellite-visual">
+                    <div class="orbit-animation">
+                        <div class="satellite-icon">◆</div>
+                        <div class="orbit-path"></div>
+                    </div>
+                    <div class="signal-waves">
+                        <div class="wave wave-1"></div>
+                        <div class="wave wave-2"></div>
+                        <div class="wave wave-3"></div>
+                    </div>
+                </div>
+                
+                <div class="satellite-status">
+                    <div class="status-row">
+                        <span class="label">SATELLITE:</span>
+                        <span class="value" id="sat-name">ASTRA-2G</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">ORBITAL POS:</span>
+                        <span class="value" id="sat-position">28.2°E</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">FREQUENCY:</span>
+                        <span class="value" id="sat-freq">11.7 GHz</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">SIGNAL:</span>
+                        <span class="value signal-strength" id="sat-signal">█████████░ 89%</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">UPLINK:</span>
+                        <span class="value uplink-status" id="sat-uplink">ESTABLISHING...</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="label">ENCRYPTION:</span>
+                        <span class="value encryption-status" id="sat-encryption">AES-256</span>
+                    </div>
+                </div>
+                
+                <div class="satellite-progress">
+                    <div class="progress-label">DATA TRANSMISSION PROGRESS:</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="upload-progress"></div>
+                    </div>
+                    <div class="progress-text" id="upload-text">0% - STANDBY</div>
+                    <div class="transmission-stats">
+                        <div class="stat">
+                            <span class="stat-label">SPEED:</span>
+                            <span class="stat-value" id="transfer-speed">0 KB/s</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">ETA:</span>
+                            <span class="stat-value" id="transfer-eta">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-console" class="screen">
+        <div class="console-header">
+            <div class="console-title">PROJECT NIGHTFALL - INTELLIGENCE DATABASE</div>
+            <div class="console-info">
+                <span>USER: PHOENIX_7</span>
+                <span>CLEARANCE: BETA</span>
+                <span>STATUS: ACTIVE</span>
+            </div>
+        </div>
+        
+        <div class="console-content">
+            <div class="left-panel">
+                <div class="file-browser">
+                    <div class="browser-header">CLASSIFIED FILES</div>
+                    <div class="file-list">
+                        <div class="file-item" data-file="personnel">
+                            <span class="file-icon">📁</span>
+                            <span class="file-name">PERSONNEL_RECORDS</span>
+                            <span class="file-security">TOP SECRET</span>
+                        </div>
+                        <div class="file-item" data-file="operations">
+                            <span class="file-icon">📁</span>
+                            <span class="file-name">OPERATION_FILES</span>
+                            <span class="file-security">CLASSIFIED</span>
+                        </div>
+                        <div class="file-item" data-file="surveillance">
+                            <span class="file-icon">📁</span>
+                            <span class="file-name">SURVEILLANCE_DATA</span>
+                            <span class="file-security">RESTRICTED</span>
+                        </div>
+                        <div class="file-item" data-file="target" class="target-file">
+                            <span class="file-icon">🔒</span>
+                            <span class="file-name">OPERATION_MIDNIGHT</span>
+                            <span class="file-security">ULTRA SECRET</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div class="network-topology">
+                    <div class="browser-header">NETWORK TOPOLOGY</div>
+                    <div class="network-content">
+                        <div class="network-node central-node">
+                            <div class="node-label">CORE SERVER</div>
+                            <div class="node-status online">ONLINE</div>
+                        </div>
+                        <div class="network-node database-node">
+                            <div class="node-label">DATABASE</div>
+                            <div class="node-status online">SECURE</div>
+                        </div>
+                        <div class="network-node firewall-node">
+                            <div class="node-label">FIREWALL</div>
+                            <div class="node-status warning">ACTIVE</div>
+                        </div>
+                        <div class="network-node surveillance-node">
+                            <div class="node-label">SURVEILLANCE</div>
+                            <div class="node-status online">MONITORING</div>
+                        </div>
+                        <div class="network-connections">
+                            <div class="connection"></div>
+                            <div class="connection"></div>
+                            <div class="connection"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="system-status">
+                    <div class="browser-header">SYSTEM STATUS</div>
+                    <div class="status-content">
+                        <div class="status-item">
+                            <span class="status-label">SECURITY LEVEL:</span>
+                            <span class="status-value high">MAXIMUM</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">ACTIVE USERS:</span>
+                            <span class="status-value">247</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">THREAT LEVEL:</span>
+                            <span class="status-value low">LOW</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">LAST BACKUP:</span>
+                            <span class="status-value">23:47:12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
