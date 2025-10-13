@@ -330,9 +330,8 @@ class NightfallHack {
     startAuthentication() {
         this.hideAllCursors();
         
-        setTimeout(() => {
-            this.showAccessDenied();
-        }, 1500);
+        // Show access denied immediately after authenticating popup closes
+        this.showAccessDenied();
     }
 
     showAccessDenied() {
