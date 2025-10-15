@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PROJECT NIGHTFALL - ACCESS TERMINAL</title>
     <link rel="stylesheet" href="style.css">
+<!-- Cronitor RUM -->
+<script async src="https://rum.cronitor.io/script.js"></script>
+<script>
+    window.cronitor = window.cronitor || function() { (window.cronitor.q = window.cronitor.q || []).push(arguments); };
+    cronitor('config', { clientKey: '675b19bbc171b02fc80c72b1be8bd250' });
+</script>
 </head>
 <body>
     <div id="connect-screen" class="screen active">
@@ -187,6 +193,18 @@
         </div>
     </div>
 
+    <div id="loading-cctv-popup" class="popup">
+        <div class="popup-content">
+            <div>LOADING CCTV...</div>
+        </div>
+    </div>
+
+    <div id="loading-satellite-popup" class="popup">
+        <div class="popup-content">
+            <div>LOADING SATELLITE...</div>
+        </div>
+    </div>
+
     <div id="cctv-window" class="cctv-window">
         <div class="cctv-header">
             <span>CCTV-CAM-03 - NEXUS FACILITY</span>
@@ -303,7 +321,7 @@
                             <span class="file-name">SURVEILLANCE_DATA</span>
                             <span class="file-security">RESTRICTED</span>
                         </div>
-                        <div class="file-item" data-file="target" class="target-file">
+                        <div class="file-item target-file cta-highlight" data-file="target">
                             <span class="file-icon">🔒</span>
                             <span class="file-name">OPERATION_MIDNIGHT</span>
                             <span class="file-security">ULTRA SECRET</span>

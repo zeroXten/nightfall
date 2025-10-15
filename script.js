@@ -283,7 +283,7 @@ class NightfallHack {
     handlePostDeniedTyping() {
         this.keyPressCount++;
         
-        if (this.keyPressCount >= 30) {
+        if (this.keyPressCount >= 5) {
             this.showTerminal();
         }
     }
@@ -397,9 +397,7 @@ class NightfallHack {
         }
         
         if (this.currentCommand >= this.terminalCommands.length) {
-            setTimeout(() => {
-                this.showAccessGranted();
-            }, 1000);
+            this.showAccessGranted();
         }
     }
 
@@ -520,7 +518,7 @@ class NightfallHack {
     handlePrivilegeDeniedTyping() {
         this.privilegeKeyCount++;
         
-        if (this.privilegeKeyCount >= 25) {
+        if (this.privilegeKeyCount >= 5) {
             this.showPrivilegeTerminal();
         }
     }
@@ -891,8 +889,8 @@ END OF CLASSIFIED DOCUMENT`;
     handlePostDecryptionFailureTyping() {
         this.postDecryptionFailureKeyCount++;
         
-        // After 20 keypresses, show the decryption hack terminal
-        if (this.postDecryptionFailureKeyCount >= 20) {
+        // After 5 keypresses, show the decryption hack terminal
+        if (this.postDecryptionFailureKeyCount >= 5) {
             this.startDecryptionHack();
         }
     }
@@ -1491,8 +1489,8 @@ END OF CLASSIFIED DOCUMENT`;
     handleCCTVSurveillanceTyping() {
         this.keyPressCount++;
         
-        // After 15 keypresses, show terminal for CCTV hack
-        if (this.keyPressCount >= 15) {
+        // After 5 keypresses, show terminal for CCTV hack
+        if (this.keyPressCount >= 5) {
             this.showCCTVTerminal();
         }
     }
@@ -1582,22 +1580,31 @@ END OF CLASSIFIED DOCUMENT`;
             }
         }
         
-        // After final command, show CCTV window
+        // After final command, show loading popup then CCTV window
         if (this.currentCCTVCommand >= this.cctvCommands.length) {
-            setTimeout(() => {
-                this.showCCTVWindow();
-                // Mark CCTV as complete, ready for user to run satellite commands
-                this.cctvComplete = true;
-                // User can now type satellite commands if they choose
-                this.currentPhase = 'cctv-complete';
-                this.keyPressCount = 0; // Reset for satellite command detection
-            }, 2000);
+            this.showLoadingCCTVPopup();
         }
+    }
+
+    showLoadingCCTVPopup() {
+        const popup = document.getElementById('loading-cctv-popup');
+        popup.classList.add('show');
+        
+        // Show loading for 2 seconds, then show CCTV window
+        setTimeout(() => {
+            popup.classList.remove('show');
+            this.showCCTVWindow();
+        }, 2000);
     }
 
     showCCTVWindow() {
         const cctvWindow = document.getElementById('cctv-window');
         cctvWindow.classList.add('show');
+        
+        // Mark CCTV as complete, ready for user to run satellite commands
+        this.cctvComplete = true;
+        this.currentPhase = 'cctv-complete';
+        this.keyPressCount = 0; // Reset for satellite command detection
         
         // Start timestamp updating
         this.updateCCTVTimestamp();
@@ -1616,8 +1623,8 @@ END OF CLASSIFIED DOCUMENT`;
         // Check if they're starting satellite commands
         this.keyPressCount++;
         
-        // After a few keypresses, transition to satellite commands
-        if (this.keyPressCount >= 3) {
+        // After 5 keypresses, transition to satellite commands
+        if (this.keyPressCount >= 5) {
             this.startSatelliteCommands();
         }
     }
@@ -1702,7 +1709,7 @@ END OF CLASSIFIED DOCUMENT`;
         switch(this.currentSatelliteCommand) {
             case 0:
                 response = '[+] Scanning orbital frequencies...<br>[+] Satellite ASTRA-2G located at 28.2°E<br>[+] Establishing uplink connection...<br>[+] Authentication successful - OMEGA clearance confirmed<br><span style="color: #00ffc4;">[SUCCESS] SATELLITE UPLINK ACTIVE</span>';
-                setTimeout(() => this.showSatelliteWindow(), 2000);
+                this.showLoadingSatellitePopup();
                 break;
             case 1:
                 response = '[+] Initiating encrypted handshake...<br>[+] AES-256 encryption negotiated<br>[+] Master key verification complete<br>[+] Secure communication channel established<br><span style="color: #00ffc4;">[SUCCESS] ENCRYPTED TUNNEL READY</span>';
@@ -1734,6 +1741,17 @@ END OF CLASSIFIED DOCUMENT`;
                 }
             }, 2000);
         }
+    }
+
+    showLoadingSatellitePopup() {
+        const popup = document.getElementById('loading-satellite-popup');
+        popup.classList.add('show');
+        
+        // Show loading for 2 seconds, then show satellite window
+        setTimeout(() => {
+            popup.classList.remove('show');
+            this.showSatelliteWindow();
+        }, 2000);
     }
 
     showSatelliteWindow() {
@@ -1793,6 +1811,13 @@ END OF CLASSIFIED DOCUMENT`;
                     this.satelliteComplete = true;
                     this.currentPhase = 'satellite-complete';
                     this.keyPressCount = 0; // Reset for virus command detection
+                    
+                    // Show input line for next commands
+                    const inputLine = document.getElementById('terminal-input').closest('.terminal-line');
+                    if (inputLine) {
+                        inputLine.style.display = 'block';
+                        this.resetInputState();
+                    }
                 }, 1000);
             }
         }, 800);
@@ -1803,8 +1828,8 @@ END OF CLASSIFIED DOCUMENT`;
         // Check if they're starting virus commands
         this.keyPressCount++;
         
-        // After a few keypresses, transition to virus commands
-        if (this.keyPressCount >= 3) {
+        // After 5 keypresses, transition to virus commands
+        if (this.keyPressCount >= 5) {
             this.startVirusCommands();
         }
     }
